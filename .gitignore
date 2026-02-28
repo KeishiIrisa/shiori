@@ -1,0 +1,32 @@
+# env and secrets
+.env
+.env.*
+!.env.example
+
+# credentials
+*-credentials*.json
+*.pem
+
+# Firebase
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebase/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Go (backend)
+backend/bin/
+*.exe
+
+# misc
+*.log
+*.tmp
