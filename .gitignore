@@ -30,3 +30,6 @@ backend/bin/
 # misc
 *.log
 *.tmp
+
+# DEPLOY
+DEPLOY.md
