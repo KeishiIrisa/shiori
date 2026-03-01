@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { createBoard } from "@/lib/api";
+import { DEFAULT_CATEGORIES } from "@/lib/categories";
 import { getOrCreateDeviceId } from "@/lib/deviceId";
 import { setCurrentUser } from "@/lib/localStorage";
 
@@ -13,6 +14,8 @@ export default function NewBoardPage() {
   const [title, setTitle] = useState("");
   const [memberInput, setMemberInput] = useState("");
   const [memberChips, setMemberChips] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [tagChips, setTagChips] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -26,6 +29,18 @@ export default function NewBoardPage() {
 
   const removeMember = (i: number) => {
     setMemberChips((prev) => prev.filter((_, idx) => idx !== i));
+  };
+
+  const addTag = () => {
+    const name = tagInput.trim();
+    if (!name) return;
+    if (tagChips.includes(name)) return;
+    setTagChips((prev) => [...prev, name]);
+    setTagInput("");
+  };
+
+  const removeTag = (i: number) => {
+    setTagChips((prev) => prev.filter((_, idx) => idx !== i));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,7 +57,8 @@ export default function NewBoardPage() {
     setLoading(true);
     try {
       const deviceId = getOrCreateDeviceId();
-      const { board_id } = await createBoard(title.trim(), memberChips, deviceId);
+      const tags = tagChips.length > 0 ? tagChips : undefined;
+      const { board_id } = await createBoard(title.trim(), memberChips, deviceId, tags);
       if (memberChips[0]) setCurrentUser(memberChips[0]);
       router.push(`/board/${board_id}`);
     } catch (err) {
@@ -131,6 +147,51 @@ export default function NewBoardPage() {
               )}
               <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
                 リンクを追加するときに「誰が追加したか」を選べます
+              </p>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                カテゴリ（タブ）
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="例: 香川"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
+                  className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+                />
+                <button
+                  type="button"
+                  onClick={addTag}
+                  className="shrink-0 rounded-xl bg-amber-500 px-5 py-3 font-medium text-white shadow-md transition hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                >
+                  追加
+                </button>
+              </div>
+              {tagChips.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {tagChips.map((name, i) => (
+                    <span
+                      key={`${name}-${i}`}
+                      className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 py-1.5 pl-3 pr-1 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                    >
+                      {name}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(i)}
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                        aria-label={`${name}を削除`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                空のままなら「{DEFAULT_CATEGORIES.join("・")}」になります。地域名などにカスタムできます。
               </p>
             </div>
             {error && (
