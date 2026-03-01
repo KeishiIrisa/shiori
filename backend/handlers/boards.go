@@ -12,6 +12,8 @@ import (
 	"github.com/irisakeishi/shiori/backend/services"
 )
 
+var defaultBoardTags = []string{"ご飯", "観光", "その他"}
+
 type BoardHandler struct {
 	firestore *services.FirestoreService
 }
@@ -24,6 +26,7 @@ type createBoardRequest struct {
 	Title    string   `json:"title"`
 	Members  []string `json:"members"`
 	DeviceID string   `json:"device_id"` // 作成端末の一意識別子（localStorage の UUID）
+	Tags     []string `json:"tags"`     // カテゴリ（タブ）のラベル。空ならデフォルト（ご飯, 観光, その他）
 }
 
 type createBoardResponse struct {
@@ -60,12 +63,25 @@ func (h *BoardHandler) CreateBoard(c *gin.Context) {
 		return
 	}
 
+	tags := defaultBoardTags
+	if len(req.Tags) > 0 {
+		tags = make([]string, 0, len(req.Tags))
+		for _, t := range req.Tags {
+			if s := strings.TrimSpace(t); s != "" {
+				tags = append(tags, s)
+			}
+		}
+		if len(tags) == 0 {
+			tags = defaultBoardTags
+		}
+	}
+
 	boardID := uuid.NewString()
 	board := &models.Board{
 		ID:                boardID,
 		Title:             strings.TrimSpace(req.Title),
 		Members:           members,
-		Tags:              []string{"ご飯", "観光", "その他"},
+		Tags:              tags,
 		CreatedByDeviceID: strings.TrimSpace(req.DeviceID),
 	}
 

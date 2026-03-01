@@ -14,14 +14,17 @@ export function BoardHeader({ board, boardId, onBoardUpdate }: Props) {
   const [editOpen, setEditOpen] = useState(false);
   const [editTitle, setEditTitle] = useState(board.title);
   const [editMembers, setEditMembers] = useState<string[]>(board.members);
+  const [editTags, setEditTags] = useState<string[]>(board.tags ?? []);
   const [newMemberInput, setNewMemberInput] = useState("");
+  const [newTagInput, setNewTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     setEditTitle(board.title);
     setEditMembers([...board.members]);
-  }, [board.title, board.members]);
+    setEditTags([...(board.tags ?? [])]);
+  }, [board.title, board.members, board.tags]);
 
   const shareUrl =
     typeof window !== "undefined"
@@ -31,10 +34,12 @@ export function BoardHeader({ board, boardId, onBoardUpdate }: Props) {
   const openEdit = useCallback(() => {
     setEditTitle(board.title);
     setEditMembers([...board.members]);
+    setEditTags([...(board.tags ?? [])]);
     setNewMemberInput("");
+    setNewTagInput("");
     setError("");
     setEditOpen(true);
-  }, [board.title, board.members]);
+  }, [board.title, board.members, board.tags]);
 
   const addMember = () => {
     const name = newMemberInput.trim();
@@ -45,6 +50,16 @@ export function BoardHeader({ board, boardId, onBoardUpdate }: Props) {
   };
   const removeMember = (i: number) =>
     setEditMembers((m) => m.filter((_, idx) => idx !== i));
+
+  const addTag = () => {
+    const name = newTagInput.trim();
+    if (!name) return;
+    if (editTags.includes(name)) return;
+    setEditTags((t) => [...t, name]);
+    setNewTagInput("");
+  };
+  const removeTag = (i: number) =>
+    setEditTags((t) => t.filter((_, idx) => idx !== i));
 
   const handleSaveEdit = useCallback(async () => {
     setError("");
@@ -61,6 +76,7 @@ export function BoardHeader({ board, boardId, onBoardUpdate }: Props) {
       const updated = await updateBoard(boardId, {
         title: editTitle.trim(),
         members: editMembers,
+        tags: editTags,
       });
       onBoardUpdate(updated);
       setEditOpen(false);
@@ -69,7 +85,7 @@ export function BoardHeader({ board, boardId, onBoardUpdate }: Props) {
     } finally {
       setSaving(false);
     }
-  }, [boardId, editTitle, editMembers, onBoardUpdate]);
+  }, [boardId, editTitle, editMembers, editTags, onBoardUpdate]);
 
   const handleShareLink = useCallback(() => {
     if (!shareUrl) return;
@@ -179,6 +195,46 @@ export function BoardHeader({ board, boardId, onBoardUpdate }: Props) {
                   <button
                     type="button"
                     onClick={addMember}
+                    className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
+                  >
+                    追加
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  カテゴリ（タブ）
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {editTags.map((name, i) => (
+                    <span
+                      key={`tag-${name}-${i}`}
+                      className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 py-1.5 pl-3 pr-1 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                    >
+                      {name}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(i)}
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                        aria-label={`${name}を削除`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="例: 香川"
+                    value={newTagInput}
+                    onChange={(e) => setNewTagInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
+                    className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 placeholder:text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={addTag}
                     className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
                   >
                     追加

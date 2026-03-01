@@ -26,12 +26,21 @@ export type Link = {
 export async function createBoard(
   title: string,
   members: string[],
-  deviceId: string
+  deviceId: string,
+  tags?: string[]
 ): Promise<{ board_id: string }> {
+  const body: Record<string, unknown> = {
+    title,
+    members,
+    device_id: deviceId,
+  };
+  if (tags != null && tags.length > 0) {
+    body.tags = tags;
+  }
   const res = await fetch(`${getBaseUrl()}/api/boards`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, members, device_id: deviceId }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
