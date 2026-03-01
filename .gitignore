@@ -25,6 +25,7 @@ Thumbs.db
 
 # Go (backend)
 backend/bin/
+backend/server
 *.exe
 
 # misc

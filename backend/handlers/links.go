@@ -64,10 +64,16 @@ func (h *LinkHandler) CreateLink(c *gin.Context) {
 
 	domain := extractDomain(req.URL)
 
+	imageURL := ogpData.ImageURL
+	if imageURL == "" && domain != "" {
+		// サムネイルが取れなかった場合は favicon URL を image_url に使う
+		imageURL = "https://www.google.com/s2/favicons?domain=" + url.QueryEscape(domain) + "&sz=128"
+	}
+
 	link := &models.Link{
 		URL:         req.URL,
 		Title:       ogpData.Title,
-		ImageURL:    ogpData.ImageURL,
+		ImageURL:    imageURL,
 		Description: ogpData.Description,
 		Domain:      domain,
 		Category:    req.Category,
