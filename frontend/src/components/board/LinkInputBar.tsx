@@ -18,15 +18,13 @@ type Props = {
 
 export function LinkInputBar({ boardId, board, onLinksUpdate }: Props) {
   const [url, setUrl] = useState("");
+  const members = board.members.length > 0 ? board.members : ["自分"];
+  const tags = board.tags?.length ? board.tags : [...DEFAULT_CATEGORIES];
+
   const [selectedMember, setSelectedMember] = useState(() => getCurrentUser() ?? board.members[0] ?? "");
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    DEFAULT_CATEGORIES[0] ?? ""
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string>(tags[0] ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const members = board.members.length > 0 ? board.members : ["自分"];
-  const tags = board.tags.length > 0 ? board.tags : [...DEFAULT_CATEGORIES];
 
   const handleAdd = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
