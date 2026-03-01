@@ -7,7 +7,7 @@ import { deleteLink, toggleReaction } from "@/lib/api";
 import { getCategoryStyle } from "@/lib/categories";
 
 const REACTION_EMOJIS = ["👍", "🔥", "❤️", "😋"];
-const LONG_PRESS_MS = 1500;
+const LONG_PRESS_MS = 1000;
 
 type Props = {
   link: Link;
@@ -117,7 +117,7 @@ export function LinkCard({
 
   return (
     <article
-      className="break-inside-avoid rounded-2xl border border-slate-200/80 bg-white/80 shadow-lg shadow-slate-200/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl dark:border-slate-700/80 dark:bg-slate-800/80 dark:shadow-slate-900/50"
+      className="select-none break-inside-avoid rounded-2xl border border-slate-200/80 bg-white/80 shadow-lg shadow-slate-200/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl dark:border-slate-700/80 dark:bg-slate-800/80 dark:shadow-slate-900/50"
       onContextMenu={handleContextMenu}
       onTouchStart={handleLongPressStart}
       onTouchEnd={handleLongPressEnd}
@@ -211,11 +211,11 @@ export function LinkCard({
       {/* 削除確認モーダル（長押し or 右クリックで表示） */}
       {deleteModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="select-none fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           onClick={() => !deleting && setDeleteModalOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            className="select-none w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="mb-4 text-slate-800 dark:text-slate-100">
