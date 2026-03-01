@@ -7,7 +7,7 @@ import { deleteLink, toggleReaction } from "@/lib/api";
 import { getCategoryStyle } from "@/lib/categories";
 
 const REACTION_EMOJIS = ["👍", "🔥", "❤️", "😋"];
-const LONG_PRESS_MS = 500;
+const LONG_PRESS_MS = 1500;
 
 type Props = {
   link: Link;
